@@ -1,13 +1,27 @@
+require('dotenv').config();
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const mongoose = require('mongoose');
 
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
 
 var app = express();
+
+mongoose
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    useUnifiedTopology: true,
+    useFindAndModify: false,
+    autoIndex: false
+  })
+  .then(() => {
+    console.log('MongoDB Connected ...');
+  })
+  .catch(err => console.error(err));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -20,7 +34,6 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
-app.use('/users', usersRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -36,6 +49,15 @@ app.use(function(err, req, res, next) {
   // render the error page
   res.status(err.status || 500);
   res.render('error');
+});
+
+let port = process.env.PORT || 8080;
+
+app.listen(port, () => {
+  console.log(`Server listening on port ${port}`);
+});
+app.on('error', error => {
+  console.error('Error: ', error);
 });
 
 module.exports = app;
