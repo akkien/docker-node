@@ -5,7 +5,6 @@ WORKDIR /home/node/docker_node
 
 # COPY ./package.json .
 # RUN yarn install
-VOLUME ["/home/node/docker_node"]
 
 COPY --chown=node:node . .
 CMD [ "yarn","dev" ]  
